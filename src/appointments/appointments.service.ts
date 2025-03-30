@@ -3,9 +3,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { LibSQLDatabase } from 'drizzle-orm/libsql';
 import * as schema from './schema';
 import { DATABASE_CONNECTION } from 'src/database/database.module';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql, between, desc } from 'drizzle-orm';
 import { SQLiteColumn } from 'drizzle-orm/sqlite-core';
-import { sql } from 'drizzle-orm';
+import { doctors } from '../doctors/schema';
+import { patients } from '../patients/schema';
 
 @Injectable()
 export class AppointmentsService {
@@ -16,6 +17,30 @@ export class AppointmentsService {
 
     async getAppointments() {
         return this.database.select().from(schema.appointments);
+    }
+
+    async getDetailedAppointments() {
+        return this.database
+          .select({
+            appointment: schema.appointments,
+            doctor: {
+              id: doctors.id_dc,
+              nombre: doctors.nombre,
+              apellido_p: doctors.apellido_p,
+              apellido_m: doctors.apellido_m,
+              prof_id: doctors.prof_id,
+            },
+            patient: {
+              id: patients.id_pc,
+              nombre: patients.nombre,
+              apellido_p: patients.apellido_p,
+              apellido_m: patients.apellido_m,
+            },
+          })
+          .from(schema.appointments)
+          .leftJoin(doctors, eq(schema.appointments.id_dc, doctors.id_dc))
+          .leftJoin(patients, eq(schema.appointments.id_pc, patients.id_pc))
+          .orderBy(desc(schema.appointments.date), desc(schema.appointments.time));
     }
 
     async createAppointment(appointment: typeof schema.appointments.$inferInsert) {
@@ -80,6 +105,10 @@ function lte(column: SQLiteColumn, value: string) {
 
         // Si no hay filtros, devolver todas las citas
         return this.getAppointments();
+    }
+
+    async getAppointmentDetailsFromView() {
+        return this.database.run(sql`SELECT * FROM appointment_details`);
     }
 } 
 

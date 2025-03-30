@@ -126,7 +126,12 @@ export class AuthService {
       user[0].role,
     );
     await this.updateRefreshTokenHash(user[0].id, tokens.refreshToken);
-    return tokens;
+
+    // Devolver el id_us junto con los tokens
+    return {
+        ...tokens,
+        id_us: user[0].id // Incluir el ID del usuario en la respuesta
+    };
   }
 
   async logout(userId: number) {

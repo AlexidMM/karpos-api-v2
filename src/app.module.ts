@@ -15,6 +15,8 @@ import { MedicalRecordsModule } from './medical-records/medical-records.module';
 import { IotModule } from './iot/iot.module';
 import { SensorsModule } from './sensors/sensors.module';
 import { ControlReleModule } from './control-rele/control-rele.module';
+import { ViewPaciendatosModule } from './view-paciendatos/view-paciendatos.module'; // Añade esta línea
+
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { ControlReleModule } from './control-rele/control-rele.module';
     PatientsModule,
     AppointmentsModule,
     MedicalRecordsModule,
+    ViewPaciendatosModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

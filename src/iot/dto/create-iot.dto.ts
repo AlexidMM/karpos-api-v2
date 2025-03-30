@@ -18,7 +18,4 @@ export class CreateIotDto {
 
   @IsString()
   horaFin: string;
-
-  @IsString()
-  cita: string;
 }

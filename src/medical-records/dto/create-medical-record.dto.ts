@@ -1,3 +1,4 @@
+//backend: src/medical-records/dto/create-medical-record.dto.ts
 import { IsString, IsNumber, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateMedicalRecord {

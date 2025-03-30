@@ -13,7 +13,6 @@ export const appointments = sqliteTable('appointments', {
     payment_status: text('payment_status', { enum: ['pending', 'paid', 'failed'] }).default('pending').notNull(),
     payment_amount: real('payment_amount').notNull(),
     notes: text('notes'),
-    iot_data_id: text('iot_data_id'),
     created_at: text('created_at').default('CURRENT_TIMESTAMP').notNull(),
     updated_at: text('updated_at').default('CURRENT_TIMESTAMP').notNull(),
 }); 

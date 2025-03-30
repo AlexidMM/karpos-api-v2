@@ -19,8 +19,6 @@ export class IotData extends Document {
   @Prop({ type: String, required: true })
   horaFin: string;
 
-  @Prop({ type: String, required: true })
-  cita: string;
 }
 
 export const IotSchema = SchemaFactory.createForClass(IotData);

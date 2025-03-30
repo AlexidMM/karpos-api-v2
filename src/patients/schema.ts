@@ -1,3 +1,4 @@
+//src/patients/schema.ts
 import { integer, sqliteTable, text, real } from "drizzle-orm/sqlite-core";
 import { users } from "../users/schema";
 

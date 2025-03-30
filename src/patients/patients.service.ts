@@ -1,5 +1,4 @@
-//src/patients/patients.service.ts
-import { Inject, Injectable, BadRequestException, ConflictException } from '@nestjs/common';
+import { Inject, Injectable, BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { LibSQLDatabase } from 'drizzle-orm/libsql';
 import * as schema from './schema';
 import { CreatePatientWithUserDto } from './dto/create-patient-with-user.dto';
@@ -21,12 +20,47 @@ export class PatientsService {
         return this.database.select().from(schema.patients);
     }
 
+    async findPatientByUserId(idUs: number) {
+        const patients = await this.database.select()
+            .from(schema.patients)
+            .where(eq(schema.patients.id_us, idUs));
+        
+        if (patients.length === 0) {
+            return null;
+        }
+        
+        return patients[0];
+    }
+
     async createPatient(patient: typeof schema.patients.$inferInsert) {
         await this.database.insert(schema.patients).values(patient);
     }
 
     async deletePatient(id: number) {
         await this.database.delete(schema.patients).where(eq(schema.patients.id_pc, id));
+    }
+
+    async deletePatientAndUser(patientId: number) {
+        // Find the patient first
+        const patients = await this.database.select()
+            .from(schema.patients)
+            .where(eq(schema.patients.id_pc, patientId));
+
+        if (patients.length === 0) {
+            throw new NotFoundException('Paciente no encontrado');
+        }
+
+        const patient = patients[0];
+
+        // Delete the patient
+        await this.deletePatient(patientId);
+
+        // Delete the associated user
+        if (patient.id_us) {
+            await this.usersService.deleteUser(patient.id_us);
+        }
+
+        return { message: 'Paciente y usuario eliminados exitosamente' };
     }
 
     async updatePatient(id: number, updates: Partial<typeof schema.patients.$inferInsert>) {
@@ -43,14 +77,14 @@ export class PatientsService {
 
     async createPatientWithUser(data: CreatePatientWithUserDto) {
         try {
-            // Crear el usuario y obtener su ID
+            // Create the user and get its ID
             const userId = await this.usersService.createUser(data.user);
             
             if (!userId) {
                 throw new Error('No se pudo obtener el ID del usuario creado');
             }
             
-            // Crear el paciente con el ID del usuario
+            // Create the patient with the user ID
             const patientData = {
                 nombre: data.nombre,
                 apellido_p: data.apellido_p,
@@ -82,4 +116,4 @@ export class PatientsService {
             throw new BadRequestException('No se pudo crear el usuario: ' + error.message);
         }
     }
-} 
+}

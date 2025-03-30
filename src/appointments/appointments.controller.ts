@@ -1,7 +1,8 @@
 //src/appointments/appointments.controller.ts
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Patch, Query } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointment } from './dto/create-appointment.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -30,5 +31,11 @@ export class AppointmentsController {
     @Put(':id')
     async updateAppointment(@Param('id') id: string, @Body() updates: Partial<CreateAppointment>) {
         return this.appointmentsService.updateAppointment(Number(id), updates);
+    }
+
+    @Public()
+    @Get('details/view')
+    async getAppointmentDetailsFromView() {
+        return this.appointmentsService.getAppointmentDetailsFromView();
     }
 } 
